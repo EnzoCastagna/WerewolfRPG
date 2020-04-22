@@ -1,0 +1,8 @@
+Todos foram dormir. {if | lobos > 0} [ Os lobos acordam, eles podem atacar algum jogador ou não (90%) {if| perdidos > 0} [, eles podem atacar: {perdidos}, esses jogadores levarão 4 de dano (75%)]
+{for | lobos} [ quem você gostaria de "visitar"?
+{if | perdido}[{ifchance | 75}]
+{if | dorminhocos > 0} [ Os dorminhocos acordam: {dorminhocos}, eles podem visitar a casa de um jogador.
+{for | dorminhocos} [ quem você gostaria de visitar? 
+{if | fora} [ A pessoa não está em casa. ] {if | dentro} [ A pessoa está em casa. ] ] ]
+
+
