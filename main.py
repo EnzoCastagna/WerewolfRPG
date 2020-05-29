@@ -1,6 +1,17 @@
 from os import listdir
 from random import randint
 
+def gamebegin():
+"""Gathers the name of the Players and sets them Player Tags to be later used"""
+print ("Sejam Bem-Vindos ã ilha das carnicas, onde os canibais residem e vocês, náufragos azarados, também. Parabéns!")
+Players = input ("Qual é o nome de cada um dos náufragos? Moderador: Insira os nomes separados por Vírgula. Ex: Gustavo, Enzo").split(", ")
+d = {}
+print (Players) #index to humans
+print (len(Players) #another index
+for x in range(0,len(Players)): #for looping
+d["Player{0}".format(x)]= Players[x]
+print (d)
+
 """Essa seção inteira existe para criação de jogadores e de eventos"""
 
 storyFull = ''
