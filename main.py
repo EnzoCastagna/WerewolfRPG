@@ -41,28 +41,50 @@ def getCharacter(name, characters):
             return num
         num = num + 1
 
-def getDead(hp):
+#The function below needs an update.
+def getDead(hp, dead, characters, loop, storyFull):
     tempDead = []
-    for hps in hp:
-        if hp <= 0:
+    for i in range(len(hp)):
+        if hp[i] <= 0 and not dead[i]:
+            tempDead.append(True)
+            print(characters[1] + " morreru.")
+            storyFull = storyFull + characters[i] + " morreu no dia " + str(loop) + ". "
+        elif hp[i] <= 0:
             tempDead.append(True)
         else:
-            tempDead.append(True)
-    return tempDead
+            tempDead.append(False)
+    return storyFull, tempDead
 
 
 """Win/lose Functions"""
 
 def lost(werewolf, dead):
     tempDeathCount = 0
-    num = 0
-    for i in len(werewolf):
-        print(i)
-        if not werewolf[i] == dead[i]:
+    for i in range(len(werewolf)):
+        if not werewolf[i] and dead[i]:
             tempDeathCount = tempDeathCount + 1
-    if tempDeathCount >= 2*int(len(characters)/3):
+    if tempDeathCount >= (len(characters) - int(len(characters)/3)):
         return True
     return False
+
+def won(werewolf, dead):
+    tempDeathCount = 0
+    for i in range(len(werewolf)):
+        if werewolf[i] and dead[i]:
+            tempDeathCount = tempDeathCount + 1
+    if tempDeathCount >= int(len(werewolf)/3):
+        return True
+    return False
+
+def isFinished(werewolf, dead, storyFull):
+    if lost(werewolf, dead):
+        storyFull = storyFull + "\n \nOs lobos vencem."
+        return storyFull,False
+
+    elif won(werewolf, dead):
+        storyFull = storyFull + "\n \nOs náufragos vencem."
+        return storyFull,False
+    return storyFull, True
 
 
 """Cycle Functions"""
@@ -71,9 +93,11 @@ def night(characters, werewolf, sleepy, inside, hp, dead, storyFull):
     attacked = []
     sleepy_next = sleepy
     i = 0
-    storyFull = storyFull + "\n O dia virou noite."
+    storyFull = storyFull + " " + "O dia virou noite."
+    print("O dia virou noite.")
+    storyFull = storyFull + " " + "Os lobos acordam."
+    print("Os lobos acordam.")
     for isWerewolf in werewolf:
-        storyFull = storyFull + "Os lobos acordam."
         if isWerewolf:
             victim = input(characters[i] + ", Quem você gostaria de visistar?")
             if victim in characters:
@@ -81,31 +105,33 @@ def night(characters, werewolf, sleepy, inside, hp, dead, storyFull):
                     sleepy_next[i] = True
                 attacked.append(victim)
                 inside[i] = False
-                storyFull = (storyFull + str(characters[i]) + "ataca"
+                storyFull = (storyFull + " " + str(characters[i]) + " ataca "
                 + str(attacked[-1]) + ".")
+                print(str(characters[i]) + " ataca " + str(attacked[-1]) + ".")
         i = i + 1
 
     i = 0
+    storyFull = storyFull + " " + "Os dorminhocos acordam."
+    print("Os dorminhocos acordam.")
     for isSleepy in sleepy:
-        storyFull = storyFull + "Os dorminhocos acordam."
         if isSleepy:
             sleepy_next[i] = False
-            visit = input(characters[i] + ", Escolha alguma casa para visitar")
+            visit = input(characters[i] + ", Escolha alguma casa para visitar ")
             if visit in characters:
                 inside[i] = False
                 if inside[getCharacter(visit, characters)]:
                     print(str(characters[i]) + " visita "
                     + str(characters[getCharacter(visit, characters)])
-                    + " e o encountra")
-                    storyFull = (storyFull + str(characters[i])
+                    + " e o encountra ")
+                    storyFull = (storyFull + " " + str(characters[i])
                     + " visita "
                     + str(characters[getCharacter(visit, characters)])
-                    + "e o encountra" + ".")
+                    + " e o encountra " + ".")
                 else:
                     print(str(characters[i]) + " visita "
                     + str(characters[getCharacter(visit, characters)])
                     + ",porém não o encountra")
-                    storyFull = (storyFull + str(characters[i])
+                    storyFull = (storyFull + " " + str(characters[i])
                     + " visita "
                     + str(characters[getCharacter(visit, characters)])
                     + ",porém não o encountra" + ".")
@@ -115,36 +141,42 @@ def night(characters, werewolf, sleepy, inside, hp, dead, storyFull):
             hp[getCharacter(victims, characters)] = hp[getCharacter(victims, characters)] - 4
         else:
             hp[getCharacter(victims, characters)] = hp[getCharacter(victims, characters)] - 2
-    return characters, werewolf, sleepy_next, inside, hp, storyFull
+
+    return characters, werewolf, sleepy_next, inside, hp, dead, storyFull
 
 def day(characters, werewolf, sleepy, inside, hp, dead, storyFull):
-    executed = input("Exexute alguém: ")
+    executed = input("A noite virou dia. Os náufragos escolhem alguém para executar: ")
+    storyFull = storyFull + "\n \nA noite virou dia, os sobreviventes acordam e escolhem " + str(executed) + " para ser executado. "
     hp[getCharacter(executed, characters)] = 0
+
     return characters, werewolf, sleepy, inside, hp, dead, storyFull
 
 
 """Main loop"""
-
+loop = 0
 while requesting:
     """Does night cycle and update deaths"""
     characters, werewolf, sleepy, inside, hp, dead, storyFull = night(characters,
                                                             werewolf, sleepy,
                                                             inside, hp, dead,
                                                             storyFull)
-    dead = getDead(hp)
+    storyFull, dead = getDead(hp, dead, characters, loop, storyFull)
+    print(hp)
+    storyFull, requesting = isFinished(werewolf, dead, storyFull)
 
-    """Does day cycle and update deaths"""
-    characters, werewolf, sleepy, inside, hp, dead, storyFull = day(characters,
-                                                            werewolf, sleepy,
-                                                            inside, hp, dead,
-                                                            storyFull)
-    dead = getDead(hp)
+    loop = loop + 1
 
-    """Tests win/lost condition and ends game"""
-    if lost(werewolf, dead):
-        requesting = False
+    if requesting:
+        """Does day cycle and update deaths"""
+        characters, werewolf, sleepy, inside, hp, dead, storyFull = day(characters,
+                                                                werewolf, sleepy,
+                                                                inside, hp, dead,
+                                                                storyFull)
+        storyFull, dead = getDead(hp, dead, characters, loop, storyFull)
 
-    #elif won(werwolf, dead):
-    #    requesting = False
+    print(hp)
+    storyFull, requesting = isFinished(werewolf, dead, storyFull)
 
+    loop = loop + 1
+print(storyFull)
     
