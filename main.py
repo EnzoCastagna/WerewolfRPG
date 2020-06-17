@@ -12,14 +12,13 @@ characters = input("Qual é o nome de cada um dos náufragos? Moderador: " +
                    "Insira os nomes separados por Vírgula. Ex: Gustavo,"
                    + " Enzo: ").split(", ")
 
-trust = [[100]*len(characters) for i in characters]
-hp = [4]*len(characters)
-inside = [True]*len(characters)
-werewolf = [False]*len(characters)
-healingpotion = [False]*len(characters)
-knife = [False]*len(characters)
-sleepy = [False]*len(characters)
-dead = [False]*len(characters)
+#this following variable is meant to be in place of stuff I don' t understand
+insertvalue = 917
+
+for i in range(len(characters)):
+    #the name is now inside the dictionary and should work
+    #creating one dictionary for each player inside the list
+    characters[i] = {'name': characters[i], 'trust': insertvalue, 'hp': insertvalue, 'inside':True,'werewolf' : False, 'healingpotion': False, 'knife' : False, 'sleepy': False, 'dead': False}
 
 for i in range(int(len(characters)/3)):
     werewolf[randint(0, len(characters) - 1)] = True
@@ -33,7 +32,7 @@ for event in listdir("Events/"):
 
 
 """Status Functions"""
-
+#couldn't update this function to work with dictionary due to "name" variable
 def getCharacter(name, characters):
     num = 0
     for i in characters:
@@ -41,15 +40,15 @@ def getCharacter(name, characters):
             return num
         num = num + 1
 
-#The function below needs an update.
-def getDead(hp, dead, characters, loop, storyFull):
+#The function was updated to work with the new dictionary mechanic
+def getDead(characters):
     tempDead = []
-    for i in range(len(hp)):
-        if hp[i] <= 0 and not dead[i]:
+    for i in range(len(characters)):
+        if characters[i]['hp'] <= 0 and not characters[i]['dead']:
             tempDead.append(True)
-            print(characters[1] + " morreru.")
-            storyFull = storyFull + characters[i] + " morreu no dia " + str(loop) + ". "
-        elif hp[i] <= 0:
+            print(characters[1] + " morreu.")
+            storyFull = storyFull + characters[i]['name'] + " morreu no dia " + str(loop) + ". "
+        elif characters[i]['hp'] <= 0:
             tempDead.append(True)
         else:
             tempDead.append(False)
@@ -58,30 +57,34 @@ def getDead(hp, dead, characters, loop, storyFull):
 
 """Win/lose Functions"""
 
-def lost(werewolf, dead):
+#this function was updated to work with the dictionary mechanic
+def lost(characters):
     tempDeathCount = 0
-    for i in range(len(werewolf)):
-        if not werewolf[i] and dead[i]:
+    for i in range(len(characters)):
+        if not characters[i]['werewolf'] and characters[i]['dead']:
             tempDeathCount = tempDeathCount + 1
     if tempDeathCount >= (len(characters) - int(len(characters)/3)):
         return True
-    return False
+    else
+        return False
 
-def won(werewolf, dead):
+#this function was updated to work with the dictionary mechanic
+def won(characters):
     tempDeathCount = 0
-    for i in range(len(werewolf)):
-        if werewolf[i] and dead[i]:
+    for i in range(len(characters)):
+        if characters[i]['werewolf'] and characters[i]['dead']:
             tempDeathCount = tempDeathCount + 1
     if tempDeathCount >= int(len(werewolf)/3):
         return True
     return False
 
-def isFinished(werewolf, dead, storyFull):
-    if lost(werewolf, dead):
+#this function was updated to work with the dictionary mechanic
+def isFinished(characters, storyFull):
+    if lost(characters):
         storyFull = storyFull + "\n \nOs lobos vencem."
-        return storyFull,False
+        return storyFull, False
 
-    elif won(werewolf, dead):
+    elif won(characters):
         storyFull = storyFull + "\n \nOs náufragos vencem."
         return storyFull,False
     return storyFull, True
@@ -122,19 +125,19 @@ def night(characters, werewolf, sleepy, inside, hp, dead, storyFull):
                 if inside[getCharacter(visit, characters)]:
                     print(str(characters[i]) + " visita "
                     + str(characters[getCharacter(visit, characters)])
-                    + " e o encountra ")
+                    + " e o encontra ")
                     storyFull = (storyFull + " " + str(characters[i])
                     + " visita "
                     + str(characters[getCharacter(visit, characters)])
-                    + " e o encountra " + ".")
+                    + " e o encontra " + ".")
                 else:
                     print(str(characters[i]) + " visita "
                     + str(characters[getCharacter(visit, characters)])
-                    + ",porém não o encountra")
+                    + ",porém não o encontra")
                     storyFull = (storyFull + " " + str(characters[i])
                     + " visita "
                     + str(characters[getCharacter(visit, characters)])
-                    + ",porém não o encountra" + ".")
+                    + ",porém não o encontra" + ".")
         i = i + 1
     for victims in attacked:
         if not inside[getCharacter(victims, characters)]:
